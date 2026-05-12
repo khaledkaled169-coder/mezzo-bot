@@ -1,0 +1,5 @@
+python-telegram-bot
+aiohttp
+Pillow
+pytesseract
+python-dotenv
