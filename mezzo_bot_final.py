@@ -491,6 +491,12 @@ def admin_buttons(req_id: int, req_type: str):
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    user_row = get_user(user_id)
+    if user_row and user_row.get("mezzo_id"):
+        await show_main_menu(update, context)
+        return
+
     keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
     await update.message.reply_text(
         "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
@@ -652,32 +658,35 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔙 Back", callback_data="deposit")]
         ]
         await query.edit_message_text(
-            f"💳 Amount: {amount} ETB\n\nChoose payment method:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            f"💳 Amount: `{amount}` ETB\n\nChoose payment method:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_telebirr":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
             f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
             f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -688,13 +697,13 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("⏳ Fetching your live balance...")
             live_balance = await cashbox_get_balance(mezzo_id)
             if live_balance is not None:
-                balance_text = f"💰 YOUR BALANCE\n\n🌐 Live (mezzo.bet): {live_balance} ETB"
+                balance_text = f"💰 YOUR BALANCE\n\n🌐 Live (mezzo.bet): `{live_balance}` ETB"
             else:
                 # Fallback to local DB if cashbox API fails
                 local_bal = get_balance(user_id)
                 balance_text = (
                     f"💰 YOUR BALANCE\n\n"
-                    f"Available: {local_bal} ETB\n"
+                    f"Available: `{local_bal}` ETB\n"
                     f"⚠️ Balance service is temporarily unavailable.\n"
                     f"Contact support: @mezzodeposite"
                 )
@@ -702,13 +711,14 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             local_bal = get_balance(user_id)
             balance_text = (
                 f"💰 YOUR BALANCE\n\n"
-                f"Available: {local_bal} ETB\n"
+                f"Available: `{local_bal}` ETB\n"
                 f"⚠️ No Mezzo ID linked to your account."
             )
 
         await query.edit_message_text(
             balance_text,
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "withdraw":
@@ -725,9 +735,10 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🆘 SUPPORT\n\n"
             "Contact us:\n"
             "Telegram: @mezzodeposite\n"
-            "Phone: +251712759695\n"
+            "Phone: `+251712759695`\n"
             "Hours: 12AM - 12PM",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "transactions":
@@ -736,13 +747,14 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             lines = []
             for t_type, amount, note, created_at in rows:
                 emoji = "➕" if t_type == "deposit" else "➖"
-                lines.append(f"{emoji} {amount} ETB — {note}\n🕐 {created_at[:16]}")
+                lines.append(f"{emoji} `{amount}` ETB — {note}\n🕐 {created_at[:16]}")
             text = "📋 TRANSACTIONS\n\n" + "\n\n".join(lines)
         else:
             text = "📋 TRANSACTIONS\n\nNo transactions yet."
         await query.edit_message_text(
             text,
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "back":
@@ -777,19 +789,19 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("⏳ Fetching your live balance...")
             live_balance = await cashbox_get_balance(mezzo_id)
             if live_balance is not None:
-                balance_text = f"💰 YOUR BALANCE\n\n🌐 Live (mezzo.bet): {live_balance} ETB"
+                balance_text = f"💰 YOUR BALANCE\n\n🌐 Live (mezzo.bet): `{live_balance}` ETB"
             else:
                 local_bal = get_balance(user.id)
                 balance_text = (
                     f"💰 YOUR BALANCE\n\n"
-                    f"Available: {local_bal} ETB\n"
+                    f"Available: `{local_bal}` ETB\n"
                     f"⚠️ Balance service is temporarily unavailable.\n"
                     f"Contact support: @mezzodeposite"
                 )
         else:
             local_bal = get_balance(user.id)
-            balance_text = f"💰 YOUR BALANCE\n\nAvailable: {local_bal} ETB"
-        await update.message.reply_text(balance_text, reply_markup=get_bottom_menu())
+            balance_text = f"💰 YOUR BALANCE\n\nAvailable: `{local_bal}` ETB"
+        await update.message.reply_text(balance_text, reply_markup=get_bottom_menu(), parse_mode="Markdown")
         return
     if text == "➕ Deposit":
         keyboard = [
@@ -866,9 +878,10 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             f"✅ Registration complete!\n\n"
             f"📋 Your details:\n"
-            f"• Phone: {db_user['phone']}\n"
-            f"• Mezzo ID: {text}\n\n"
-            f"Welcome to Mezzo Bot! 🎉"
+            f"• Phone: `{db_user['phone']}`\n"
+            f"• Mezzo ID: `{text}`\n\n"
+            f"Welcome to Mezzo Bot! 🎉",
+            parse_mode="Markdown"
         )
         await show_main_menu(update, context)
         return
@@ -951,8 +964,9 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔙 Back", callback_data="deposit")]
         ]
         await update.message.reply_text(
-            f"💳 Amount: {text} ETB\n\nChoose payment method:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            f"💳 Amount: `{text}` ETB\n\nChoose payment method:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 
 # ── Screenshot handler ────────────────────────────────────────────────────────
