@@ -491,6 +491,23 @@ def admin_buttons(req_id: int, req_type: str):
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    user_data = get_user(user_id)
+
+    if user_data:
+        if user_data.get("mezzo_id"):
+            await update.message.reply_text(f"👋 Welcome back, {user_data.get('name', 'User')}!")
+            await show_main_menu(update, context)
+            return
+        else:
+            context.user_data["waiting_mezzo_id"] = True
+            await update.message.reply_text(
+                "✅ Phone number already registered!\n\n"
+                "Please enter your mezzo.bet ID to complete registration:",
+                reply_markup=ReplyKeyboardRemove()
+            )
+            return
+
     keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
     await update.message.reply_text(
         "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
@@ -660,24 +677,26 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
             f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
             f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
