@@ -446,6 +446,18 @@ def get_transactions(user_id: int, limit: int = 10):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def escape_markdown(text: str) -> str:
+    """Helper to escape special Markdown characters to prevent Telegram API errors."""
+    if not text:
+        return ""
+    # Characters that need escaping in Telegram's Markdown (V1)
+    # _, *, [, `
+    # Note: Telegram's MarkdownV2 is stricter, but we are using V1 here.
+    chars = ['_', '*', '[', '`']
+    for char in chars:
+        text = str(text).replace(char, f"\\{char}")
+    return text
+
 def is_receipt_link(text: str) -> bool:
     return "apps.cbe.com.et" in text or "transactioninfo.ethiotelecom.et" in text
 
@@ -657,27 +669,29 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     elif data == "pay_telebirr":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = escape_markdown(context.user_data.get("deposit_amount", "?"))
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"*📱 TELEBIRR PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = escape_markdown(context.user_data.get("deposit_amount", "?"))
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"*🏦 CBE PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -722,12 +736,13 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "support":
         await query.edit_message_text(
-            "🆘 SUPPORT\n\n"
+            "*🆘 SUPPORT*\n\n"
             "Contact us:\n"
             "Telegram: @mezzodeposite\n"
-            "Phone: +251712759695\n"
+            "Phone: `+251712759695`\n"
             "Hours: 12AM - 12PM",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "transactions":
@@ -863,12 +878,15 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Phone: {db_user['phone']}\n"
             f"Mezzo ID: {text}"
         )
+        phone_esc = escape_markdown(db_user['phone'])
+        mezzo_id_esc = escape_markdown(text)
         await update.message.reply_text(
-            f"✅ Registration complete!\n\n"
+            f"*✅ Registration complete!*\n\n"
             f"📋 Your details:\n"
-            f"• Phone: {db_user['phone']}\n"
-            f"• Mezzo ID: {text}\n\n"
-            f"Welcome to Mezzo Bot! 🎉"
+            f"• Phone: `{phone_esc}`\n"
+            f"• Mezzo ID: `{mezzo_id_esc}`\n\n"
+            f"Welcome to Mezzo Bot! 🎉",
+            parse_mode="Markdown"
         )
         await show_main_menu(update, context)
         return
