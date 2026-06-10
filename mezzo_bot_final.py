@@ -659,25 +659,27 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "pay_telebirr":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
+            f"*📱 TELEBIRR PAYMENT*\n\n"
             f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
+            f"*🏦 CBE PAYMENT*\n\n"
             f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -722,12 +724,13 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "support":
         await query.edit_message_text(
-            "🆘 SUPPORT\n\n"
+            "*🆘 SUPPORT*\n\n"
             "Contact us:\n"
             "Telegram: @mezzodeposite\n"
-            "Phone: +251712759695\n"
+            "Phone: `+251712759695`\n"
             "Hours: 12AM - 12PM",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "transactions":
