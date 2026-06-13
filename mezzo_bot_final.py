@@ -491,10 +491,26 @@ def admin_buttons(req_id: int, req_type: str):
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    user_row = get_user(user_id)
+
+    if user_row:
+        if user_row.get("mezzo_id"):
+            await show_main_menu(update, context)
+            return
+        else:
+            context.user_data["waiting_mezzo_id"] = True
+            await update.message.reply_text(
+                "*👋 Welcome back!*\n\nPlease enter your mezzo.bet ID to complete registration:",
+                parse_mode="Markdown"
+            )
+            return
+
     keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
     await update.message.reply_text(
-        "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
-        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        "*👋 Welcome to Mezzo Bot!*\n\nPlease share your phone number to continue.",
+        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True),
+        parse_mode="Markdown"
     )
 
 async def receive_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -519,8 +535,9 @@ async def show_main_menu(update, context):
         [InlineKeyboardButton("📋 Transactions", callback_data="transactions")]
     ]
     await update.message.reply_text(
-        "📌 Main Menu\nChoose an option:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        "*📌 MAIN MENU*\nChoose an option:",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown"
     )
     # Attach persistent bottom keyboard
     await update.message.reply_text(
@@ -756,8 +773,9 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("📋 Transactions", callback_data="transactions")]
         ]
         await query.edit_message_text(
-            "📌 Main Menu\nChoose an option:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            "*📌 MAIN MENU*\nChoose an option:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 
 # ── Text handler ──────────────────────────────────────────────────────────────
@@ -864,11 +882,12 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Mezzo ID: {text}"
         )
         await update.message.reply_text(
-            f"✅ Registration complete!\n\n"
-            f"📋 Your details:\n"
-            f"• Phone: {db_user['phone']}\n"
-            f"• Mezzo ID: {text}\n\n"
-            f"Welcome to Mezzo Bot! 🎉"
+            f"*✅ Registration complete!*\n\n"
+            f"*📋 Your details:*\n"
+            f"• Phone: `{db_user['phone']}`\n"
+            f"• Mezzo ID: `{text}`\n\n"
+            f"Welcome to Mezzo Bot! 🎉",
+            parse_mode="Markdown"
         )
         await show_main_menu(update, context)
         return
