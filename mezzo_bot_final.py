@@ -488,9 +488,29 @@ def admin_buttons(req_id: int, req_type: str):
         InlineKeyboardButton("❌ Decline", callback_data=f"admin_decline_{req_type}_{req_id}")
     ]])
 
+def esc(text: str) -> str:
+    """Escape Markdown special characters."""
+    if not text:
+        return ""
+    # Characters that need escaping in Telegram Markdown (v1)
+    # _, *, `, [
+    for char in "_*`[":
+        text = text.replace(char, f"\\{char}")
+    return text
+
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    db_user = get_user(user.id)
+    if db_user and db_user.get("mezzo_id"):
+        await update.message.reply_text(
+            f"👋 Welcome back, {esc(user.first_name)}!",
+            parse_mode="Markdown"
+        )
+        await show_main_menu(update, context)
+        return
+
     keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
     await update.message.reply_text(
         "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
@@ -519,8 +539,9 @@ async def show_main_menu(update, context):
         [InlineKeyboardButton("📋 Transactions", callback_data="transactions")]
     ]
     await update.message.reply_text(
-        "📌 Main Menu\nChoose an option:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        "*📌 MAIN MENU*\n\nChoose an option:",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown"
     )
     # Attach persistent bottom keyboard
     await update.message.reply_text(
@@ -659,25 +680,27 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "pay_telebirr":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"*📱 TELEBIRR PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"*🏦 CBE PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -864,11 +887,12 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Mezzo ID: {text}"
         )
         await update.message.reply_text(
-            f"✅ Registration complete!\n\n"
-            f"📋 Your details:\n"
-            f"• Phone: {db_user['phone']}\n"
-            f"• Mezzo ID: {text}\n\n"
-            f"Welcome to Mezzo Bot! 🎉"
+            f"*✅ REGISTRATION COMPLETE!*\n\n"
+            f"📋 *Your details:*\n"
+            f"• Phone: `{esc(db_user['phone'])}`\n"
+            f"• Mezzo ID: `{esc(text)}`\n\n"
+            f"Welcome to Mezzo Bot! 🎉",
+            parse_mode="Markdown"
         )
         await show_main_menu(update, context)
         return
