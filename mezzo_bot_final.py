@@ -446,6 +446,13 @@ def get_transactions(user_id: int, limit: int = 10):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def esc(text: str) -> str:
+    """Escape Markdown special characters for Telegram Markdown (V1)."""
+    if not text: return ""
+    for char in ['_', '*', '`', '[']:
+        text = text.replace(char, f"\\{char}")
+    return text
+
 def is_receipt_link(text: str) -> bool:
     return "apps.cbe.com.et" in text or "transactioninfo.ethiotelecom.et" in text
 
@@ -519,8 +526,9 @@ async def show_main_menu(update, context):
         [InlineKeyboardButton("📋 Transactions", callback_data="transactions")]
     ]
     await update.message.reply_text(
-        "📌 Main Menu\nChoose an option:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        "*📌 MAIN MENU*\nChoose an option:",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown"
     )
     # Attach persistent bottom keyboard
     await update.message.reply_text(
@@ -657,27 +665,29 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     elif data == "pay_telebirr":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = str(context.user_data.get("deposit_amount", "?")).replace("`", "")
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"*📱 TELEBIRR PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = str(context.user_data.get("deposit_amount", "?")).replace("`", "")
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"*🏦 CBE PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -688,27 +698,29 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("⏳ Fetching your live balance...")
             live_balance = await cashbox_get_balance(mezzo_id)
             if live_balance is not None:
-                balance_text = f"💰 YOUR BALANCE\n\n🌐 Live (mezzo.bet): {live_balance} ETB"
+                live_balance = str(live_balance).replace("`", "")
+                balance_text = f"*💰 YOUR BALANCE*\n\n🌐 Live (mezzo.bet): `{live_balance}` ETB"
             else:
                 # Fallback to local DB if cashbox API fails
-                local_bal = get_balance(user_id)
+                local_bal = str(get_balance(user_id)).replace("`", "")
                 balance_text = (
-                    f"💰 YOUR BALANCE\n\n"
-                    f"Available: {local_bal} ETB\n"
+                    f"*💰 YOUR BALANCE*\n\n"
+                    f"Available: `{local_bal}` ETB\n"
                     f"⚠️ Balance service is temporarily unavailable.\n"
                     f"Contact support: @mezzodeposite"
                 )
         else:
-            local_bal = get_balance(user_id)
+            local_bal = str(get_balance(user_id)).replace("`", "")
             balance_text = (
-                f"💰 YOUR BALANCE\n\n"
-                f"Available: {local_bal} ETB\n"
+                f"*💰 YOUR BALANCE*\n\n"
+                f"Available: `{local_bal}` ETB\n"
                 f"⚠️ No Mezzo ID linked to your account."
             )
 
         await query.edit_message_text(
             balance_text,
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "withdraw":
@@ -777,19 +789,20 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("⏳ Fetching your live balance...")
             live_balance = await cashbox_get_balance(mezzo_id)
             if live_balance is not None:
-                balance_text = f"💰 YOUR BALANCE\n\n🌐 Live (mezzo.bet): {live_balance} ETB"
+                live_balance = str(live_balance).replace("`", "")
+                balance_text = f"*💰 YOUR BALANCE*\n\n🌐 Live (mezzo.bet): `{live_balance}` ETB"
             else:
-                local_bal = get_balance(user.id)
+                local_bal = str(get_balance(user.id)).replace("`", "")
                 balance_text = (
-                    f"💰 YOUR BALANCE\n\n"
-                    f"Available: {local_bal} ETB\n"
+                    f"*💰 YOUR BALANCE*\n\n"
+                    f"Available: `{local_bal}` ETB\n"
                     f"⚠️ Balance service is temporarily unavailable.\n"
                     f"Contact support: @mezzodeposite"
                 )
         else:
-            local_bal = get_balance(user.id)
-            balance_text = f"💰 YOUR BALANCE\n\nAvailable: {local_bal} ETB"
-        await update.message.reply_text(balance_text, reply_markup=get_bottom_menu())
+            local_bal = str(get_balance(user.id)).replace("`", "")
+            balance_text = f"*💰 YOUR BALANCE*\n\nAvailable: `{local_bal}` ETB"
+        await update.message.reply_text(balance_text, reply_markup=get_bottom_menu(), parse_mode="Markdown")
         return
     if text == "➕ Deposit":
         keyboard = [
