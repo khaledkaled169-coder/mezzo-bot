@@ -1,0 +1,3 @@
+## 2026-06-16 - Telegram Tap-to-Copy Micro-UX
+**Learning:** Telegram's Markdown V1 supports monospace formatting using backticks (`` ` ``). In many Telegram clients, tapping or clicking on monospace text automatically copies it to the clipboard. This is a powerful micro-UX pattern for financial applications where users need to copy transaction IDs, account numbers, or amounts. Dynamic data in monospace blocks should be sanitized to remove internal backticks to prevent parsing breaks.
+**Action:** Use monospace formatting for all copy-critical data (phone numbers, account numbers, financial amounts) in Telegram bots. Always use a helper to clean dynamic strings before wrapping them in backticks.
