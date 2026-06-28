@@ -488,6 +488,12 @@ def admin_buttons(req_id: int, req_type: str):
         InlineKeyboardButton("❌ Decline", callback_data=f"admin_decline_{req_type}_{req_id}")
     ]])
 
+def clean_mono(text) -> str:
+    """Sanitize text for monospace blocks by removing backticks."""
+    if text is None:
+        return ""
+    return str(text).replace("`", "")
+
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -671,13 +677,14 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "pay_cbe":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
-            f"Name: Your Name\n\n"
+            f"🏦 *CBE PAYMENT*\n\n"
+            f"Amount: `{clean_mono(amount)}` ETB\n"
+            f"Account: `1000661082902`\n"
+            f"Name: *Your Name*\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
