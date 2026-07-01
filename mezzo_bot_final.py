@@ -457,14 +457,28 @@ def get_bottom_menu():
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, persistent=True)
 
-async def notify_all_admins(context, text: str, reply_markup=None):
+def esc(text: str) -> str:
+    """Escape Telegram Markdown V1 special characters (outside backticks)."""
+    if text is None: return ""
+    t = str(text)
+    for char in ["_", "*", "`", "["]:
+        t = t.replace(char, f"\\{char}")
+    return t
+
+def clean_mono(text: str) -> str:
+    """Sanitize text for monospace blocks by removing backticks."""
+    if text is None: return ""
+    return str(text).replace("`", "")
+
+async def notify_all_admins(context, text: str, reply_markup=None, parse_mode=None):
     """Send a message to all admins."""
     for admin in get_all_admins():
         try:
             await context.bot.send_message(
                 chat_id=admin[0],
                 text=text,
-                reply_markup=reply_markup
+                reply_markup=reply_markup,
+                parse_mode=parse_mode
             )
         except Exception:
             pass
@@ -491,10 +505,23 @@ def admin_buttons(req_id: int, req_type: str):
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    db_user = get_user(user.id)
+
+    if db_user and db_user.get("mezzo_id"):
+        # Personalized welcome back for registered users
+        await update.message.reply_text(
+            f"👋 Welcome back, {esc(user.first_name)}!",
+            parse_mode="Markdown"
+        )
+        await show_main_menu(update, context)
+        return
+
     keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
     await update.message.reply_text(
-        "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
-        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        f"👋 Welcome to Mezzo Bot, {esc(user.first_name)}!\n\nPlease share your phone number to continue.",
+        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True),
+        parse_mode="Markdown"
     )
 
 async def receive_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -856,19 +883,21 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         db_user = get_user(user.id)
         await notify_all_admins(
             context,
-            f"🆕 New Registration!\n"
-            f"Name: {user.first_name}\n"
-            f"Username: @{user.username}\n"
-            f"Telegram ID: {user.id}\n"
-            f"Phone: {db_user['phone']}\n"
-            f"Mezzo ID: {text}"
+            f"🆕 *New Registration!*\n"
+            f"Name: {esc(user.first_name)}\n"
+            f"Username: @{esc(user.username)}\n"
+            f"Telegram ID: `{user.id}`\n"
+            f"Phone: `{clean_mono(db_user['phone'])}`\n"
+            f"Mezzo ID: `{clean_mono(text)}`",
+            parse_mode="Markdown"
         )
         await update.message.reply_text(
-            f"✅ Registration complete!\n\n"
-            f"📋 Your details:\n"
-            f"• Phone: {db_user['phone']}\n"
-            f"• Mezzo ID: {text}\n\n"
-            f"Welcome to Mezzo Bot! 🎉"
+            f"✅ *Registration complete!*\n\n"
+            f"📋 *Your details:*\n"
+            f"• Phone: `{clean_mono(db_user['phone'])}`\n"
+            f"• Mezzo ID: `{clean_mono(text)}`\n\n"
+            f"Welcome to Mezzo Bot! 🎉",
+            parse_mode="Markdown"
         )
         await show_main_menu(update, context)
         return
