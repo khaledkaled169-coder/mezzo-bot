@@ -446,6 +446,11 @@ def get_transactions(user_id: int, limit: int = 10):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def clean_mono(text: str) -> str:
+    """Remove backticks from text to safely wrap it in a monospace block."""
+    if text is None: return ""
+    return str(text).replace('`', '')
+
 def is_receipt_link(text: str) -> bool:
     return "apps.cbe.com.et" in text or "transactioninfo.ethiotelecom.et" in text
 
@@ -652,32 +657,35 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔙 Back", callback_data="deposit")]
         ]
         await query.edit_message_text(
-            f"💳 Amount: {amount} ETB\n\nChoose payment method:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            f"💳 Amount: `{clean_mono(amount)}` ETB\n\nChoose payment method:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_telebirr":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = clean_mono(context.user_data.get("deposit_amount", "?"))
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"*📱 TELEBIRR PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = clean_mono(context.user_data.get("deposit_amount", "?"))
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"*🏦 CBE PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -951,8 +959,9 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔙 Back", callback_data="deposit")]
         ]
         await update.message.reply_text(
-            f"💳 Amount: {text} ETB\n\nChoose payment method:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            f"💳 Amount: `{clean_mono(text)}` ETB\n\nChoose payment method:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 
 # ── Screenshot handler ────────────────────────────────────────────────────────
