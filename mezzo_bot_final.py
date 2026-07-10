@@ -446,6 +446,18 @@ def get_transactions(user_id: int, limit: int = 10):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def esc(text):
+    """Escape Markdown V1 special characters for Telegram Markdown V1."""
+    if text is None:
+        return ""
+    return str(text).replace("_", "\\_").replace("*", "\\*").replace("`", "\\`").replace("[", "\\[")
+
+def clean_mono(text):
+    """Remove backticks to prevent breaking monospace blocks in Markdown V1."""
+    if text is None:
+        return ""
+    return str(text).replace("`", "")
+
 def is_receipt_link(text: str) -> bool:
     return "apps.cbe.com.et" in text or "transactioninfo.ethiotelecom.et" in text
 
@@ -457,14 +469,15 @@ def get_bottom_menu():
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, persistent=True)
 
-async def notify_all_admins(context, text: str, reply_markup=None):
+async def notify_all_admins(context, text: str, reply_markup=None, parse_mode=None):
     """Send a message to all admins."""
     for admin in get_all_admins():
         try:
             await context.bot.send_message(
                 chat_id=admin[0],
                 text=text,
-                reply_markup=reply_markup
+                reply_markup=reply_markup,
+                parse_mode=parse_mode
             )
         except Exception:
             pass
@@ -659,25 +672,27 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "pay_telebirr":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"📱 *TELEBIRR PAYMENT*\n\n"
+            f"Amount: `{clean_mono(amount)}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
         amount = context.user_data.get("deposit_amount", "?")
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"🏦 *CBE PAYMENT*\n\n"
+            f"Amount: `{clean_mono(amount)}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -856,19 +871,21 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         db_user = get_user(user.id)
         await notify_all_admins(
             context,
-            f"🆕 New Registration!\n"
-            f"Name: {user.first_name}\n"
-            f"Username: @{user.username}\n"
-            f"Telegram ID: {user.id}\n"
-            f"Phone: {db_user['phone']}\n"
-            f"Mezzo ID: {text}"
+            f"🆕 *New Registration!*\n"
+            f"Name: {esc(user.first_name)}\n"
+            f"Username: @{esc(user.username)}\n"
+            f"Telegram ID: `{user.id}`\n"
+            f"Phone: `{clean_mono(db_user['phone'])}`\n"
+            f"Mezzo ID: `{clean_mono(text)}`",
+            parse_mode="Markdown"
         )
         await update.message.reply_text(
-            f"✅ Registration complete!\n\n"
-            f"📋 Your details:\n"
-            f"• Phone: {db_user['phone']}\n"
-            f"• Mezzo ID: {text}\n\n"
-            f"Welcome to Mezzo Bot! 🎉"
+            f"✅ *Registration complete!*\n\n"
+            f"📋 *Your details:*\n"
+            f"• Phone: `{clean_mono(db_user['phone'])}`\n"
+            f"• Mezzo ID: `{clean_mono(text)}`\n\n"
+            f"Welcome to Mezzo Bot! 🎉",
+            parse_mode="Markdown"
         )
         await show_main_menu(update, context)
         return
