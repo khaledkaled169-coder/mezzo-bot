@@ -446,6 +446,12 @@ def get_transactions(user_id: int, limit: int = 10):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def clean_mono(text) -> str:
+    """Sanitize dynamic data for Telegram monospace blocks by removing backticks."""
+    if text is None:
+        return "0"
+    return str(text).replace("`", "")
+
 def is_receipt_link(text: str) -> bool:
     return "apps.cbe.com.et" in text or "transactioninfo.ethiotelecom.et" in text
 
@@ -651,33 +657,37 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🏦 CBE Bank", callback_data="pay_cbe")],
             [InlineKeyboardButton("🔙 Back", callback_data="deposit")]
         ]
+        safe_amount = clean_mono(amount)
         await query.edit_message_text(
-            f"💳 Amount: {amount} ETB\n\nChoose payment method:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            f"💳 *Amount:* `{safe_amount}` *ETB*\n\nChoose payment method:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_telebirr":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = clean_mono(context.user_data.get("deposit_amount", "?"))
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
+            f"📱 *TELEBIRR PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
             f"After paying:\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "pay_cbe":
-        amount = context.user_data.get("deposit_amount", "?")
+        amount = clean_mono(context.user_data.get("deposit_amount", "?"))
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
-            f"Name: Your Name\n\n"
+            f"🏦 *CBE PAYMENT*\n\n"
+            f"Amount: `{amount}` ETB\n"
+            f"Account: `1000661082902`\n"
+            f"Name: *Your Name*\n\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "balance":
@@ -722,12 +732,13 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "support":
         await query.edit_message_text(
-            "🆘 SUPPORT\n\n"
+            "🆘 *SUPPORT*\n\n"
             "Contact us:\n"
             "Telegram: @mezzodeposite\n"
-            "Phone: +251712759695\n"
-            "Hours: 12AM - 12PM",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
+            "Phone: `+251712759695`\n"
+            "Hours: *12AM - 12PM*",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]]),
+            parse_mode="Markdown"
         )
 
     elif data == "transactions":
@@ -900,9 +911,10 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # ── Step 3: duplicate TX ID check ─────────────────────────────────
         if tx_id and is_valid_tx(tx_id):
             if is_tx_used(tx_id):
+                safe_tx_id = clean_mono(tx_id)
                 await update.message.reply_text(
                     f"❌ Duplicate Transaction Detected!\n\n"
-                    f"Transaction ID `{tx_id}` has already been used.\n\n"
+                    f"Transaction ID `{safe_tx_id}` has already been used.\n\n"
                     f"If you believe this is an error, contact support:\n"
                     f"@mezzodeposite",
                     parse_mode="Markdown"
@@ -950,9 +962,11 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🏦 CBE Bank", callback_data="pay_cbe")],
             [InlineKeyboardButton("🔙 Back", callback_data="deposit")]
         ]
+        safe_amount = clean_mono(text)
         await update.message.reply_text(
-            f"💳 Amount: {text} ETB\n\nChoose payment method:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            f"💳 *Amount:* `{safe_amount}` *ETB*\n\nChoose payment method:",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
         )
 
 # ── Screenshot handler ────────────────────────────────────────────────────────
