@@ -446,6 +446,12 @@ def get_transactions(user_id: int, limit: int = 10):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def clean_mono(text) -> str:
+    """Sanitize text for monospace representation in Markdown."""
+    if text is None:
+        return "0"
+    return str(text).replace("`", "")
+
 def is_receipt_link(text: str) -> bool:
     return "apps.cbe.com.et" in text or "transactioninfo.ethiotelecom.et" in text
 
@@ -658,25 +664,30 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "pay_telebirr":
         amount = context.user_data.get("deposit_amount", "?")
+        cleaned_amount = clean_mono(amount)
         await query.edit_message_text(
-            f"📱 TELEBIRR PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Send to: 0910534013\n\n"
-            f"After paying:\n"
+            f"*📱 TELEBIRR PAYMENT*\n\n"
+            f"Amount: `{cleaned_amount}` ETB\n"
+            f"Send to: `0910534013`\n\n"
+            f"*After paying:*\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
+            parse_mode="Markdown",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
         )
 
     elif data == "pay_cbe":
         amount = context.user_data.get("deposit_amount", "?")
+        cleaned_amount = clean_mono(amount)
         await query.edit_message_text(
-            f"🏦 CBE PAYMENT\n\n"
-            f"Amount: {amount} ETB\n"
-            f"Account: 1000661082902\n"
+            f"*🏦 CBE PAYMENT*\n\n"
+            f"Amount: `{cleaned_amount}` ETB\n"
+            f"Account: `1000661082902`\n"
             f"Name: Your Name\n\n"
+            f"*After paying:*\n"
             f"📸 Send your screenshot here\n"
             f"We confirm within 5 min ✅",
+            parse_mode="Markdown",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="deposit")]])
         )
 
