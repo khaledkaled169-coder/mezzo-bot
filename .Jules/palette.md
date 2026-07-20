@@ -1,0 +1,3 @@
+## 2026-07-16 - Telegram Support Screen Usability and Tap-to-Copy
+**Learning:** Monospace formatting in Telegram (using backticks) is extremely helpful for phone numbers, account details, and amounts because it enables "tap-to-copy" behavior in mobile clients. However, wrapping Telegram handles (like `@mezzodeposite`) in backticks prevents them from being clickable links, which increases user friction.
+**Action:** When designing support messages or transaction guides, always format phone numbers with backticks (`` `+251712759695` ``) for rapid copying, but keep Telegram usernames/links unformatted or bolded so they can be tapped to immediately start a chat.
