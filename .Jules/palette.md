@@ -1,0 +1,3 @@
+## 2026-07-16 - Support Menu Telegram Formatting
+**Learning:** Telegram Markdown V1 does not process click actions or handles correctly inside monospace blocks (backticks), which disables clickable Telegram handles like `@mezzodeposite`. However, monospace blocks are highly beneficial for numbers like phone numbers (`+251712759695`) or transaction IDs, as they enable tap-to-copy functionality on mobile devices.
+**Action:** When updating Support or Contact screens in Telegram Bots, wrap phone numbers and IDs in monospace backticks to allow quick tap-to-copy, but always leave Telegram handles unformatted so they remain active, clickable links.
