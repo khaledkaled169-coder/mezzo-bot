@@ -1,0 +1,3 @@
+## 2026-07-16 - [Smart Re-Onboarding for Returning Users]
+**Learning:** Forcing returning users through a multi-step registration (e.g., sharing a phone number again) when they already exist in the database causes high churn and frustration. A smart re-onboarding check that either directly opens the main menu or resumes registration from the last incomplete step significantly improves the user experience.
+**Action:** Always inspect the database for existing records on commands like `/start`, and dynamically branch the onboarding flow based on which user details (e.g., `phone` or `mezzo_id`) are missing.
