@@ -1,0 +1,3 @@
+## 2026-07-16 - User Registration State Routing
+**Learning:** Hard-coded start sequences frustrate existing users by forcing them back to the initial registration screens or failing to guide partially registered users who have completed phone submission but not yet linked their platform ID. Dynamic state-aware routing makes the start command context-aware and friction-free.
+**Action:** Always route users from the `/start` handler dynamically based on their current database/registration state. For fully registered users, guide them directly to the main menu. For partially registered users, clear any stale state and prompt them directly for their platform/Mezzo ID. For new/unregistered users, request phone sharing.
