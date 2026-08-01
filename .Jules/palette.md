@@ -1,0 +1,3 @@
+## 2026-07-16 - [Dynamic Onboarding Routing for Telegram Bots]
+**Learning:** Returning users who have already registered shouldn't be greeted with the starting registration screen (e.g., phone number request) when they trigger `/start`. Dynamically routing them based on their registration state (fully registered, partially registered, or unregistered) dramatically reduces friction and provides a seamless returning-user experience.
+**Action:** Inspect user state in the database when `/start` is invoked. Route fully registered users directly to the main menu with a friendly greeting, guide partially registered users to input missing details (like their Mezzo ID), and only show the phone request keyboard to new/unregistered users.
