@@ -1,0 +1,3 @@
+## 2026-07-16 - Support Menu Micro-UX Polish
+**Learning:** Monospace formatting in Telegram is essential for numeric values like support phone numbers (`+251712759695`) as it enables quick 'tap-to-copy' functionality. However, wrapping Telegram handles (like `@mezzodeposite`) in backticks prevents them from being parsed as interactive links. Using bold formatting for headers also establishes a strong visual hierarchy.
+**Action:** Use monospace formatting for phone numbers and financial details while keeping Telegram handles unformatted so they remain clickable links. Always use bold headers to delineate sections.
