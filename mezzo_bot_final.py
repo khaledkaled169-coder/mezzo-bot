@@ -491,11 +491,28 @@ def admin_buttons(req_id: int, req_type: str):
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
-    await update.message.reply_text(
-        "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
-        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-    )
+    user = update.effective_user
+    if not user:
+        return
+    db_user = get_user(user.id)
+    if db_user and db_user.get("phone") and db_user.get("mezzo_id"):
+        # Fully registered user -> Main Menu
+        await show_main_menu(update, context)
+    elif db_user and db_user.get("phone") and not db_user.get("mezzo_id"):
+        # Partially registered -> Prompt for Mezzo ID
+        context.user_data.clear()
+        context.user_data["waiting_mezzo_id"] = True
+        await update.message.reply_text(
+            "👋 Welcome back!\n\nPlease enter your mezzo.bet ID:",
+            reply_markup=ReplyKeyboardRemove()
+        )
+    else:
+        # Unregistered -> Share Phone Number
+        keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
+        await update.message.reply_text(
+            "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
+            reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        )
 
 async def receive_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
