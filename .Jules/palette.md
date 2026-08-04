@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy Payment Instruction Micro-UX
+**Learning:** Monospace formatting (using backticks) on mobile devices allows users to copy critical numeric data (such as bank account numbers, transaction amounts, and phone numbers) with a single tap, significantly reducing user friction. Dynamic variables placed inside backticks must be sanitized to remove internal backticks to avoid formatting breakage.
+**Action:** Always wrap payment and account details in monospace blocks while ensuring dynamic content is sanitized, and always include `parse_mode="Markdown"` in the corresponding message transmission or edit calls.
