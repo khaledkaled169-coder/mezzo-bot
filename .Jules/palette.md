@@ -1,0 +1,3 @@
+## 2026-07-16 - Support Menu Polishing
+**Learning:** Monospace formatting enables instant tap-to-copy in Telegram, which is extremely useful for copying phone numbers, bank accounts, or amounts. However, wrapping Telegram handles (like @mezzodeposite) in backticks makes them unclickable on many clients. Striking a balance between tap-to-copy utility and clickable navigation links ensures high usability.
+**Action:** Always format phone numbers or codes as monospace but leave Telegram handles or links as plain clickable text. Use `parse_mode="Markdown"` explicitly when introducing markdown features.
