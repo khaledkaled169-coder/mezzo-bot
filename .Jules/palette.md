@@ -1,0 +1,3 @@
+## 2026-07-16 - Dynamic Onboarding Routing on /start Handler
+**Learning:** For a better onboarding experience, returning users should not be forced through the initial registration steps (like sharing their contact phone number) again if they run `/start` a second time. Checking user registration states dynamically ensures a friction-free experience.
+**Action:** Always inspect the user registration state in `/start` handlers: route fully-registered users to the main menu, prompt partially-registered users for missing credentials, and only show the initial signup keyboard to completely new users.
