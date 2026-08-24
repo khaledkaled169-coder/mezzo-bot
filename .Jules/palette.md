@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy for Telegram Payment Instruction Details
+**Learning:** Formatting phone numbers, bank account numbers, and transaction amounts in Telegram Markdown monospace (backticks) enables standard single-tap copying on mobile clients, significantly reducing manual copy-paste friction and preventing transcription errors during deposits.
+**Action:** When displaying account details or values that users need to transfer/input in external banking apps, always wrap numbers in backticks (`` `...` ``), sanitize dynamic values by removing internal backticks, and ensure `parse_mode="Markdown"` is set on the message edit or reply handler.
