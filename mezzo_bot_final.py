@@ -491,6 +491,23 @@ def admin_buttons(req_id: int, req_type: str):
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    user_data = get_user(user_id)
+
+    if user_data and user_data.get("mezzo_id"):
+        await show_main_menu(update, context)
+        return
+
+    if user_data and user_data.get("phone"):
+        context.user_data.clear()
+        context.user_data["waiting_mezzo_id"] = True
+        await update.message.reply_text(
+            "✅ Phone number already registered!\n\n"
+            "Please enter your mezzo.bet ID:",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        return
+
     keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
     await update.message.reply_text(
         "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
