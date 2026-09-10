@@ -3,6 +3,7 @@ import hashlib
 import re
 import io
 import os
+import html
 import aiohttp
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps, ImageChops, ImageStat
 import pytesseract
@@ -736,12 +737,14 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             lines = []
             for t_type, amount, note, created_at in rows:
                 emoji = "➕" if t_type == "deposit" else "➖"
-                lines.append(f"{emoji} {amount} ETB — {note}\n🕐 {created_at[:16]}")
-            text = "📋 TRANSACTIONS\n\n" + "\n\n".join(lines)
+                clean_note = html.escape(str(note or ""))
+                lines.append(f"{emoji} <code>{amount} ETB</code> — {clean_note}\n🕐 {created_at[:16]}")
+            text = "<b>📋 TRANSACTIONS</b>\n\n" + "\n\n".join(lines)
         else:
-            text = "📋 TRANSACTIONS\n\nNo transactions yet."
+            text = "<b>📋 TRANSACTIONS</b>\n\nNo transactions yet."
         await query.edit_message_text(
             text,
+            parse_mode="HTML",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
         )
 
