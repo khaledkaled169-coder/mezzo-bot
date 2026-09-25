@@ -8,6 +8,7 @@ from PIL import Image, ImageFilter, ImageEnhance, ImageOps, ImageChops, ImageSta
 import pytesseract
 from telegram import (Update, InlineKeyboardButton, InlineKeyboardMarkup,
                        KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram.helpers import escape_markdown
 from telegram.ext import (ApplicationBuilder, CommandHandler,
     MessageHandler, CallbackQueryHandler, filters, ContextTypes)
 
@@ -736,12 +737,14 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
             lines = []
             for t_type, amount, note, created_at in rows:
                 emoji = "➕" if t_type == "deposit" else "➖"
-                lines.append(f"{emoji} {amount} ETB — {note}\n🕐 {created_at[:16]}")
-            text = "📋 TRANSACTIONS\n\n" + "\n\n".join(lines)
+                safe_note = escape_markdown(note or "", version=1)
+                lines.append(f"{emoji} `{amount} ETB` — {safe_note}\n🕐 {created_at[:16]}")
+            text = "📋 *TRANSACTIONS*\n\n" + "\n\n".join(lines)
         else:
-            text = "📋 TRANSACTIONS\n\nNo transactions yet."
+            text = "📋 *TRANSACTIONS*\n\nNo transactions yet.\n\n💡 *Tip:* Use *➕ Deposit* or *➖ Withdraw* from the menu to start!"
         await query.edit_message_text(
             text,
+            parse_mode="Markdown",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
         )
 
