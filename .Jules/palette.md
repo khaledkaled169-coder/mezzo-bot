@@ -1,0 +1,3 @@
+## 2026-07-16 - Telegram Monospace Tap-to-Copy UX Pattern
+**Learning:** In Telegram bots, wrapping critical transactional details (account numbers, phone numbers, amounts) in monospace backticks (` `` `) enables native tap-to-copy functionality on mobile devices, drastically reducing user copy errors during payment workflows. Dynamic inputs placed within backticks must have internal backticks sanitized to prevent Telegram Markdown parsing failures.
+**Action:** Always format account numbers, payment phones, and amounts as monospace inline code blocks when presenting payment or account instructions, and sanitize dynamic values with `.replace("`", "")`.
