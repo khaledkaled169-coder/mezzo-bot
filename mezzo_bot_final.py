@@ -863,12 +863,15 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Phone: {db_user['phone']}\n"
             f"Mezzo ID: {text}"
         )
+        clean_phone = str(db_user['phone']).replace("`", "")
+        clean_mezzo_id = text.replace("`", "")
         await update.message.reply_text(
-            f"✅ Registration complete!\n\n"
-            f"📋 Your details:\n"
-            f"• Phone: {db_user['phone']}\n"
-            f"• Mezzo ID: {text}\n\n"
-            f"Welcome to Mezzo Bot! 🎉"
+            f"🎉 *Registration Complete!*\n\n"
+            f"📋 *Your details:*\n"
+            f"• Phone: `{clean_phone}`\n"
+            f"• Mezzo ID: `{clean_mezzo_id}`\n\n"
+            f"Welcome to Mezzo Bot!",
+            parse_mode="Markdown"
         )
         await show_main_menu(update, context)
         return
