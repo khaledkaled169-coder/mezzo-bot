@@ -10,6 +10,7 @@ from telegram import (Update, InlineKeyboardButton, InlineKeyboardMarkup,
                        KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (ApplicationBuilder, CommandHandler,
     MessageHandler, CallbackQueryHandler, filters, ContextTypes)
+from telegram.helpers import escape_markdown
 
 # ── Tesseract path (Windows) ──────────────────────────────────────────────────
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -491,6 +492,26 @@ def admin_buttons(req_id: int, req_type: str):
 # ── User handlers ─────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    effective_user = update.effective_user
+    db_user = get_user(effective_user.id) if effective_user else None
+
+    if db_user and db_user.get("phone") and db_user.get("mezzo_id"):
+        name = escape_markdown(db_user.get("name") or effective_user.first_name, version=1)
+        await update.message.reply_text(
+            f"👋 Welcome back, *{name}*!",
+            parse_mode="Markdown"
+        )
+        await show_main_menu(update, context)
+        return
+
+    if db_user and db_user.get("phone"):
+        context.user_data["waiting_mezzo_id"] = True
+        await update.message.reply_text(
+            "👋 Welcome back!\n\nPlease enter your mezzo.bet ID to complete registration:",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        return
+
     keyboard = [[KeyboardButton("📱 Share Phone Number", request_contact=True)]]
     await update.message.reply_text(
         "👋 Welcome to Mezzo Bot!\n\nPlease share your phone number to continue.",
