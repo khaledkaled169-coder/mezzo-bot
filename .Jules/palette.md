@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy Monospace Details in Payment Instructions
+**Learning:** Telegram mobile and desktop clients allow users to tap/click any text formatted as inline code (`backticks`) to copy it directly to the clipboard. In payment flow instructions (such as Telebirr numbers or CBE bank account numbers), placing raw phone/account numbers and transaction amounts inside backticks eliminates friction during money transfers. Dynamic amounts should always have internal backticks stripped before interpolation to avoid Markdown syntax errors.
+**Action:** Always format payment accounts, transaction reference numbers, and custom amounts in Telegram bot responses using monospace backticks with `parse_mode="Markdown"`, while sanitizing dynamic string values.
