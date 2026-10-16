@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy Monospace Formatting for Telebirr and CBE Payment Instructions
+**Learning:** Telegram mobile clients render text formatted with backticks (` `...` `) as monospace blocks that can be single-tapped to copy to the clipboard. Adding monospace formatting to payment numbers and account details dramatically reduces user copy-paste friction and errors during mobile bank transfers.
+**Action:** Always format account numbers, transaction IDs, phone numbers, and cleaned currency amounts in monospace backticks in Telegram bot payment messages, ensuring `parse_mode="Markdown"` is enabled and dynamic strings have backticks removed.
