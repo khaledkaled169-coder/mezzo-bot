@@ -714,9 +714,10 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "withdraw":
         context.user_data["waiting_withdraw_code"] = True
         await query.edit_message_text(
-            "➖ WITHDRAW\n\n"
-            "⚠️ Minimum withdrawal: 500 ETB\n\n"
+            "*➖ WITHDRAW*\n\n"
+            "⚠️ Minimum withdrawal: `500` ETB\n\n"
             "mezzo.bet ላይ withdraw ካዘዛቹ በኋላ የሚሰጣቹን code ላኩልን 📸",
+            parse_mode="Markdown",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back", callback_data="back")]])
         )
 
@@ -810,9 +811,10 @@ async def receive_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "➖ Withdraw":
         context.user_data["waiting_withdraw_code"] = True
         await update.message.reply_text(
-            "➖ WITHDRAW\n\n"
-            "⚠️ Minimum withdrawal: 500 ETB\n\n"
+            "*➖ WITHDRAW*\n\n"
+            "⚠️ Minimum withdrawal: `500` ETB\n\n"
             "mezzo.bet ላይ withdraw ካዘዛቹ በኋላ የሚሰጣቹን code ላኩልን 📸",
+            parse_mode="Markdown",
             reply_markup=get_bottom_menu()
         )
         return
