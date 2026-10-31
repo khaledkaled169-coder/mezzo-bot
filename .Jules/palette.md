@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy Phone Formatting in Telegram Bot Support Menu
+**Learning:** In Telegram bots, wrapping phone numbers in monospace backticks allows mobile users to tap once to copy them directly to the clipboard without copying extraneous label text, while Telegram handles (e.g., `@mezzodeposite`) must remain unformatted outside monospace code blocks to stay clickable as direct links.
+**Action:** When displaying phone numbers, account numbers, or transaction IDs, format them with monospace backticks and ensure `parse_mode="Markdown"` is enabled, while keeping Telegram usernames/handles unquoted so native link interaction is preserved.
