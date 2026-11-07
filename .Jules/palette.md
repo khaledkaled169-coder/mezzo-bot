@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy Monospace for Support Details in Telegram Bots
+**Learning:** Monospace formatting (backticks in Telegram Markdown) enables convenient tap-to-copy functionality for numeric strings like phone numbers and account numbers on mobile clients. However, wrapping Telegram handles (e.g., `@username`) in monospace breaks their auto-linking behavior in most Telegram mobile and desktop clients, preventing users from simply tapping to initiate a chat.
+**Action:** When polishing Telegram bot support or contact messages, wrap phone numbers and account IDs in monospace backticks, but keep Telegram handles and usernames unformatted so they remain interactive clickable links.
