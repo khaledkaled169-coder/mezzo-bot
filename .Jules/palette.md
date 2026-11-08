@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy Phone Formatting and Clickable Handles in Support UI
+**Learning:** In Telegram bots, displaying contact information such as phone numbers in monospace backticks (`+251712759695`) enables one-tap copying in mobile clients, significantly speeding up user dialer handoff. However, Telegram handles like `@username` must NOT be wrapped in backticks, as monospace styling strips Telegram's native autolinking and renders the handle unclickable.
+**Action:** When designing contact and support message cards in Telegram bots, format phone numbers and account identifiers in monospace for tap-to-copy, but keep `@handle` entities unformatted to preserve client linkability.
