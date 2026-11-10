@@ -1,0 +1,3 @@
+## 2026-07-16 - Tap-to-Copy Phone Formatting and Link Preservation in Telegram Bots
+**Learning:** In Telegram bots, displaying phone numbers in monospace blocks (backticks) enables effortless single-tap copying on mobile clients without selecting unwanted label text, whereas Telegram handles (e.g., `@mezzodeposite`) should remain outside monospace formatting to preserve clickable deep links.
+**Action:** When presenting contact or support info in Telegram bot messages, enclose phone numbers, account numbers, and codes in monospace backticks and keep `@username` handles plain with `parse_mode="Markdown"`.
